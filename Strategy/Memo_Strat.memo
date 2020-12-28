@@ -1,0 +1,44 @@
+Indicateurs utilisé : 
+Prix max et min sur 1 an passé
+Moyenne mobile : max value 12 dernier + min value 12 dernier
+- EMA 12
+- EMA 26
+MSI 14 : 30/70
+!! Liste des résistance ichimoku ? -> A voir si utilisation facile !!
+
+// Les périodes longues sont prioritaires si à la hausse
+Sur périodicité 1 jour : 
+
+    // Investissement sur périodes longues lorsque tendance à la hausse
+    Si tendance à la hausse (indic ema 12 + 26){
+
+        Signal achat :
+        Si croisement ema 26 et ema12 passe dessus + espacement >= 100€ entre les 2 indicateurs + les 2 indicateurs sont en augmentation alors achat
+
+        Signal vente :
+        !!! STOP LOSS OBLIGATOIRE prix d'achat initiale -5% ou si prix +10% alors stoploss à +5% !!!
+        Si croisement ema 26 et ema12 passe dessous
+
+    }
+    
+    // Investissement rapides sur périodes plus courtes 
+    Sinon si tendance à la baisse ou en range{
+
+        Sur périodicité 15 minutes : 
+
+        Signal achat : 
+        Si croise ema 26 et ema12 passe dessus + RSI bas (<=35%) + prix sous ema 12 et ema 26
+        STOP LOSS : Si augmentation >= +2% -> STOPLOSS = prix d'achat + ((prix d'achat - prix après augmentation) / 2)
+                    Si nouvelle augmentation -> STOPLOSS = prix du btc au dernier stoploss + ((prix du btc au dernier stoploss - prix après augmentation) / 2)
+        STOP LOSS DE DEPART : prix de depart -2%
+
+
+        Signal vente : 
+        Si ema12 croise ema 26 et ema12 passe en dessous + RSI haut (>=65%) 
+        Sinon à l'activation du STOPLOSS
+
+        Spécial :
+        Si Prix >= 90% prix max annuel alors vente immédiate et pas d'achat avant redescente (sauf si >90% sur 2 jours alors limite passe à 95%) 
+        Si Prix <= 10% prix min annuel alors achat immédiat et pas de vente avant montée au dessus de 10% (ajouter un signal mail/sms)
+
+    }

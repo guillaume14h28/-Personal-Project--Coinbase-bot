@@ -4,7 +4,7 @@ const config = {
     duration : "",
     durationType : "",
     strategy : "",
-    currency : ""
+    currency : "",
 }
 
 module.exports = {
@@ -28,14 +28,15 @@ module.exports = {
                 strategy.backtestCheck(config.currency, data);
             }
 
-            console.log(strategy.getGlobalResult() + "%");
+            console.log("Resultat final : " + strategy.getGlobalResult() + "%");
+            console.log("Nombre de transactions effectuées : " + strategy.getNumberTransac());
         });
         
     },
 
     // Retourne profit + list trade avec +/- en %
     getResultBacktest : function(){
-
-    }
+        
+    },
 
 }

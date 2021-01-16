@@ -5,9 +5,12 @@ var utils = require("../Core/Utils");
 const config = {
     highest : 0,
     lowest : 0,
-    periode : 730,
+    periode : 24,
     memory : [],
-    result : 0
+    result : 0,
+    limiteSell : 5,
+    fees : 1,
+    countTrans : 0
 }
 
 const backtestMemo = {
@@ -30,6 +33,7 @@ module.exports = {
             config.memory.push({date : data.date, value : data.close});
             config.highest = 0;
             config.lowest = 9999999999999;
+
             for(row of config.memory){
                 if(row.value < config.lowest){
                     config.lowest = row.value;
@@ -39,12 +43,13 @@ module.exports = {
                 }
             }
             
-            if(backtestMemo.inUse == true && data.close >= config.highest){
+            if(backtestMemo.inUse == true && data.close >= config.highest && data.close > backtestMemo.value){
                 console.log(data.date);
                 console.log("Vente effectuée : " + data.close);
-                console.log("Différence : " + utils.getPercentDiff(data.close, backtestMemo.valueAtBuy) + "%");
+                console.log("Différence : " + (utils.getPercentDiff(data.close, backtestMemo.valueAtBuy) -1) + "%");
                 config.result += utils.getPercentDiff(data.close, backtestMemo.valueAtBuy);
                 backtestMemo.inUse = false;
+                config.countTrans++;
             }
     
             if(backtestMemo.inUse == false && data.close <= config.lowest){
@@ -53,6 +58,16 @@ module.exports = {
                 backtestMemo.inUse = true;
                 backtestMemo.valueAtBuy = data.close;
             }
+
+            if(backtestMemo.inUse == true && utils.getPercentDiff(data.close, backtestMemo.valueAtBuy) >= config.limiteSell){
+                console.log(data.date);
+                console.log("Vente effectuée : " + data.close);
+                console.log("Différence : " + (utils.getPercentDiff(data.close, backtestMemo.valueAtBuy) -1) + "%");
+                config.result += (utils.getPercentDiff(data.close, backtestMemo.valueAtBuy) -1);
+                backtestMemo.inUse = false;
+                config.countTrans++;
+            }
+
         }else{
             config.memory.push({date : data.date, value : data.close});
         }
@@ -62,6 +77,10 @@ module.exports = {
     // Retourne le total des pertes/benefices en %
     getGlobalResult : function(){
         return config.result;
+    },
+
+    getNumberTransac : function(){
+        return config.countTrans;
     },
 
     // Fonction appellée pour utiliser la stratégie

@@ -3,6 +3,7 @@ var moment = require("moment");
 const coinbase = require("../Core/Coinbase");
 var btc = new Datastore({ filename: './Model/Database/history_currency.db', autoload: true });
 var transac = new Datastore({ filename: './Model/Database/transaction.db', autoload: true });
+var backtest = new Datastore({ filename: './Model/Database/backtest.db', autoload: true });
 
 module.exports = {
 
@@ -15,6 +16,7 @@ module.exports = {
         var granularity = 3600; //Espacement périodes en secondes
 
         console.log("Remplissage de la BDD ...");
+        console.log("Veuillez patienter ...");
 
         while (yearAgo.isBefore(indicator)) {
 
@@ -53,10 +55,33 @@ module.exports = {
  
     },
 
+    // Vide la table correspondante
     emptyDbBitcoin : function() {
         btc.remove({}, {multi: true}, function(err){
             if(err){
                 console.log(err);
+            }else{
+                console.log("La DB a bien été vidée pour la table Bitcoin !")
+            }
+        })
+    },
+
+    emptyDbBacktest : function() {
+        backtest.remove({}, {multi: true}, function(err){
+            if(err){
+                console.log(err);
+            }else{
+                console.log("La DB a bien été vidée pour la table Backtest !")
+            }
+        })
+    },
+
+    emptyDbTransac : function() {
+        transac.remove({}, {multi: true}, function(err){
+            if(err){
+                console.log(err);
+            }else{
+                console.log("La DB a bien été vidée pour la table Transaction !")
             }
         })
     },
@@ -100,7 +125,15 @@ module.exports = {
     },
 
     getLastValuesByDuration : async function(duree, typeDuree, currency){
-        // TODO
+        return new Promise(resolve => {
+            btc.find().sort({date : 1}).exec(function(err, docs){
+                if(err){
+                    console.log(err);
+                }else{
+                    resolve(docs);
+                }
+            });
+        });
     },
 
     registerTransactionBuy : function(currency, amount){

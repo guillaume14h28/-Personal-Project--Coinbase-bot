@@ -3,8 +3,7 @@ var coinbase = require("./Core/Coinbase");
 var nomics = require("./Indicator/Nomics");
 var db = require("./Model/Database");
 var moment = require("moment");
-
-coinbase.getAllWallet();
+var backtest = require("./Core/Backtest");
 
 // coinbase.getSpotPrice("BTC-EUR");
 // coinbase.getBuyPrice("BTC-EUR");
@@ -17,6 +16,5 @@ coinbase.getAllWallet();
 
 // db.emptyDbBitcoin();
 // db.fillDatabaseCurrency("BTC-EUR");
-// db.getLastValue("BTC-EUR").then(data => {
-//     console.log(data.date);
-// });
+
+backtest.initBacktest(1, "Y", "ActualStrategy");

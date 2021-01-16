@@ -1,35 +1,35 @@
 var db = require("../Model/Database");
 
-module.exports = {
+const config = {
+    duration : "",
+    durationType : "",
+    strategy : "",
+    currency : ""
+}
 
-    config = {
-        duration : "",
-        durationType : "",
-        strategy : "",
-        currency : ""
-    },
+module.exports = {
 
     // Initialisation de la configuration du Backtest
     initBacktest : function(duree, typeDuree, strategy, cryptomonnaie){
-        this.config.duration = duree;
-        this.config.durationType = typeDuree;
-        this.config.strategy = strategy;
-        this.config.currency = cryptomonnaie;
+        config.duration = duree;
+        config.durationType = typeDuree;
+        config.strategy = strategy;
+        config.currency = cryptomonnaie;
+
+        this.launchBacktest();
     },
 
     // Lancement de l'opération de backtest
-    launchBacktest : function(){
-        var strategy = require("../Strategy/" + this.config.strategy);
-        var dataBacktest = db.getLastValuesByDuration(this.config.duration, this.config.durationType, this.config.currency);
+    launchBacktest : async function(){
+        var strategy = require("../Strategy/" + config.strategy);
+        strategy.init();
+        db.getLastValuesByDuration(config.duration, config.durationType, config.currency).then((datas) => {
+            for(var data of datas){
+                strategy.backtestCheck(config.currency, data);
+            }
 
-        db.emptyBacktest();
-
-        dataBacktest.forEach(data => {
-            var result = strategy.analyse(this.config.currency, data);
-            db.saveBacktest(data, result);
+            console.log(strategy.getGlobalResult() + "%");
         });
-
-        this.getResultBacktest();
         
     },
 
